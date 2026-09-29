@@ -27,8 +27,40 @@ jobs:
       - name: Run tests
         run: pytest
 
+  quality:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
       - name: Install flake8
         run: pip install flake8
 
       - name: Run flake8
         run: flake8 .
+
+  build:
+    runs-on: ubuntu-latest
+    needs: [test, quality]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Create build artifact
+        run: |
+          mkdir build
+          cp app.py build/
+          cp test_app.py build/
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: application-build
+          path: build/
